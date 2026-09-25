@@ -47,7 +47,7 @@ export const site = {
    * Submissions are emailed to you and kept in the Formspree dashboard.
    * When empty, the form falls back to opening the visitor's email app.
    */
-  contactFormEndpoint: '',
+  contactFormEndpoint: 'https://formspree.io/f/xbglapwd',
 
   seo: {
     title: 'Muhammad Uzair — Laravel / PHP Developer & API Integration Engineer',
