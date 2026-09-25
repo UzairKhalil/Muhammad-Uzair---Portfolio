@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Update the domain to match astro.config.mjs
-Sitemap: https://muhammad-uzair.dev/sitemap-index.xml
+Sitemap: https://muhammad-uzair-alpha.vercel.app/sitemap-index.xml

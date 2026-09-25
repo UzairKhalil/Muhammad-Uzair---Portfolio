@@ -27,7 +27,7 @@ const personSchema = {
   url: Astro.site?.toString(),
   email: `mailto:${site.email}`,
   image: imageUrl.toString(),
-  address: { '@type': 'PostalAddress', addressLocality: 'Peshawar', addressCountry: 'PK' },
+  address: { '@type': 'PostalAddress', addressLocality: site.city, addressCountry: site.countryCode },
   alumniOf: { '@type': 'CollegeOrUniversity', name: 'University of Peshawar' },
   knowsAbout: site.seo.keywords,
   sameAs: Object.values(site.social),

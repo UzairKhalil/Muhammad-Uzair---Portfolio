@@ -17,7 +17,10 @@ export const site = {
     'with 6 years of experience in SaaS, eCommerce and third-party API integrations — from Amazon SP-API and Shopify to queues and MySQL tuning.',
   intro:
     'Full-stack web developer with 6 years of experience building SaaS and eCommerce platforms in Laravel. I specialise in high-volume API integrations — Amazon SP-API, Shopify, WooCommerce, BigCommerce, eBay, Etsy and freight/parcel carriers — and in the queues and database work that keep them reliable.',
-  location: 'Peshawar, Pakistan',
+  location: 'Islamabad, Pakistan',
+  /** Used for structured data (JSON-LD). */
+  city: 'Islamabad',
+  countryCode: 'PK',
   timezone: 'PKT (UTC+5)',
   availability: 'Open to remote roles and freelance projects',
   yearsExperience: 6,
@@ -39,8 +42,10 @@ export const site = {
   resumeUrl: '',
 
   /**
-   * Optional: a form endpoint (Formspree, Getform, Basin, your own API …).
-   * When empty, the contact form opens the visitor's email client instead.
+   * Contact form endpoint. Recommended: Formspree (https://formspree.io) —
+   * create a form, then paste its endpoint here, e.g. 'https://formspree.io/f/abcdwxyz'.
+   * Submissions are emailed to you and kept in the Formspree dashboard.
+   * When empty, the form falls back to opening the visitor's email app.
    */
   contactFormEndpoint: '',
 

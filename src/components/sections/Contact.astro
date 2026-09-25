@@ -70,7 +70,7 @@ if (site.showPhone && site.phone) {
       action={site.contactFormEndpoint || `mailto:${site.email}`}
       method={site.contactFormEndpoint ? 'post' : 'get'}
       data-reveal
-      style="--reveal-delay:1"
+      style="--reveal-delay:1; position: relative"
       novalidate
     >
       <div class="field">
@@ -96,6 +96,13 @@ if (site.showPhone && site.phone) {
         <label for="cf-message">Message</label>
         <textarea id="cf-message" name="message" rows="5" required minlength="10"></textarea>
       </div>
+
+      <!-- Honeypot: invisible to people, bots fill it in and get discarded. -->
+      <div class="hp" aria-hidden="true">
+        <label for="cf-gotcha">Leave this field empty</label>
+        <input id="cf-gotcha" type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+      </div>
+      <input type="hidden" name="_subject" value="New message from your portfolio" data-subject />
 
       <div class="form__footer field--full">
         <Button type="submit" size="lg" icon="send">Send message</Button>
@@ -132,10 +139,17 @@ if (site.showPhone && site.phone) {
       return;
     }
 
-    const data = new FormData(form);
     const endpoint = form.dataset.endpoint;
+    const subjectField = form.querySelector<HTMLInputElement>('[data-subject]');
+    const nameValue = String(new FormData(form).get('name') ?? '').trim();
+    const topicValue = String(new FormData(form).get('topic') ?? '');
+    if (subjectField) subjectField.value = `[Portfolio] ${topicValue} — ${nameValue}`;
+    const data = new FormData(form);
 
     if (endpoint) {
+      const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      submitBtn?.setAttribute('disabled', '');
+      form.setAttribute('aria-busy', 'true');
       setStatus('Sending…');
       try {
         const res = await fetch(endpoint, {
@@ -143,18 +157,25 @@ if (site.showPhone && site.phone) {
           body: data,
           headers: { Accept: 'application/json' },
         });
-        if (!res.ok) throw new Error(String(res.status));
+        if (!res.ok) {
+          const body = (await res.json().catch(() => null)) as { errors?: { message: string }[] } | null;
+          throw new Error(body?.errors?.map((e) => e.message).join(' ') || `HTTP ${res.status}`);
+        }
         form.reset();
         form.classList.remove('was-validated');
-        setStatus('Thanks — your message has been sent.', 'ok');
-      } catch {
-        setStatus(`Something went wrong. Please email ${form.dataset.email} directly.`, 'error');
+        setStatus('Thanks — your message has been sent. I’ll get back to you soon.', 'ok');
+      } catch (err) {
+        console.error('Contact form failed:', err);
+        setStatus(`Sorry, that didn’t go through. Please email ${form.dataset.email} directly.`, 'error');
+      } finally {
+        submitBtn?.removeAttribute('disabled');
+        form.removeAttribute('aria-busy');
       }
       return;
     }
 
     // No endpoint configured: open the visitor's mail client.
-    const subject = `[Portfolio] ${data.get('topic')} — ${data.get('name')}`;
+    const subject = subjectField?.value ?? 'Portfolio enquiry';
     const body = `${data.get('message')}\n\n— ${data.get('name')} (${data.get('email')})`;
     window.location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     setStatus('Opening your email app…', 'ok');
@@ -326,6 +347,19 @@ if (site.showPhone && site.phone) {
 
   :global(.was-validated) :is(input, textarea):invalid {
     border-color: var(--accent);
+  }
+
+  .hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .form :global(button[disabled]) {
+    opacity: 0.6;
+    cursor: progress;
   }
 
   .form__footer {
