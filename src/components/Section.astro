@@ -1,0 +1,29 @@
+---
+interface Props {
+  id: string;
+  /** Accessible name for the section landmark; usually the heading id. */
+  labelledBy?: string;
+  tone?: 'default' | 'sunken';
+  class?: string;
+}
+
+const { id, labelledBy = `${id}-title`, tone = 'default', class: className } = Astro.props;
+---
+
+<section id={id} aria-labelledby={labelledBy} class:list={['section', `section--${tone}`, className]}>
+  <div class="container">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .section {
+    padding-block: var(--section-y);
+    position: relative;
+  }
+
+  .section--sunken {
+    background: var(--bg-sunken);
+    border-block: 1px solid var(--line);
+  }
+</style>

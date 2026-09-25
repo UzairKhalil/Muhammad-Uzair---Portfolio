@@ -1,0 +1,75 @@
+---
+import type { SkillGroup } from '@/data/skills';
+import Icon from './Icon.astro';
+import Tag from './Tag.astro';
+
+interface Props {
+  group: SkillGroup;
+  index: number;
+}
+
+const { group, index } = Astro.props;
+---
+
+<article class="skill" data-reveal style={`--reveal-delay: ${index % 3}`}>
+  <div class="skill__head">
+    <span class="skill__icon"><Icon name={group.icon} size={20} /></span>
+    <h3>{group.title}</h3>
+  </div>
+  <p>{group.description}</p>
+  <ul aria-label={`${group.title} skills`}>
+    {
+      group.items.map((item) => (
+        <li>
+          <Tag>{item}</Tag>
+        </li>
+      ))
+    }
+  </ul>
+</article>
+
+<style>
+  .skill {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%;
+    padding: 26px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--bg-elevated);
+  }
+
+  .skill__head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .skill__icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    color: var(--accent);
+  }
+
+  h3 {
+    font-size: 1.12rem;
+  }
+
+  p {
+    color: var(--muted);
+    font-size: 0.96rem;
+  }
+
+  ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: auto;
+  }
+</style>

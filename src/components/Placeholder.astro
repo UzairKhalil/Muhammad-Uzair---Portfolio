@@ -1,0 +1,83 @@
+---
+/**
+ * Clearly labelled stand-in for a missing image. Replace by supplying a real
+ * image in the corresponding data file.
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  label: string;
+  hint?: string;
+  ratio?: string;
+}
+
+const { label, hint, ratio = '16 / 10' } = Astro.props;
+---
+
+<div class="placeholder" style={`aspect-ratio: ${ratio}`} role="img" aria-label={`Placeholder: ${label}`}>
+  <div class="placeholder__grid" aria-hidden="true"></div>
+  <div class="placeholder__content">
+    <Icon name="image" size={22} />
+    <span class="placeholder__badge">Placeholder</span>
+    <span class="placeholder__label">{label}</span>
+    {hint && <span class="placeholder__hint">{hint}</span>}
+  </div>
+</div>
+
+<style>
+  .placeholder {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    overflow: hidden;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius);
+    background: var(--bg-sunken);
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .placeholder__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 24px 24px;
+    mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%);
+    opacity: 0.7;
+  }
+
+  .placeholder__content {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: 16px;
+  }
+
+  .placeholder__badge {
+    margin-top: 4px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .placeholder__label {
+    color: var(--ink-soft);
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .placeholder__hint {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    word-break: break-all;
+  }
+</style>

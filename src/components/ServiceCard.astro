@@ -1,0 +1,89 @@
+---
+import type { Service } from '@/data/services';
+import Icon from './Icon.astro';
+
+interface Props {
+  service: Service;
+  index: number;
+}
+
+const { service, index } = Astro.props;
+---
+
+<article class="service" data-reveal style={`--reveal-delay: ${index % 2}`}>
+  <div class="service__icon">
+    <Icon name={service.icon} size={22} />
+  </div>
+  <h3>{service.title}</h3>
+  <p class="service__desc">{service.description}</p>
+  <ul class="service__list">
+    {service.deliverables.map((item) => <li>{item}</li>)}
+  </ul>
+</article>
+
+<style>
+  .service {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%;
+    padding: clamp(24px, 3vw, 34px);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--bg-elevated);
+    transition:
+      border-color 0.3s var(--ease),
+      transform 0.3s var(--ease);
+  }
+
+  .service:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+  }
+
+  .service__icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  h3 {
+    font-size: 1.3rem;
+  }
+
+  .service__desc {
+    color: var(--muted);
+  }
+
+  .service__list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
+    gap: 8px 16px;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+
+  .service__list li {
+    position: relative;
+    padding-left: 16px;
+  }
+
+  .service__list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.72em;
+    width: 6px;
+    height: 1px;
+    background: var(--accent);
+  }
+</style>

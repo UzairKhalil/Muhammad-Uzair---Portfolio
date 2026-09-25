@@ -1,0 +1,355 @@
+---
+import Section from '@/components/Section.astro';
+import Icon from '@/components/Icon.astro';
+import Button from '@/components/Button.astro';
+import type { IconName } from '@/components/icons';
+import { site } from '@/data/site';
+
+interface Channel {
+  icon: IconName;
+  label: string;
+  value: string;
+  href: string;
+  external: boolean;
+}
+
+const channels: Channel[] = [
+  { icon: 'mail', label: 'Email', value: site.email, href: `mailto:${site.email}`, external: false },
+  { icon: 'linkedin', label: 'LinkedIn', value: 'muhammad-uzair', href: site.social.linkedin, external: true },
+  { icon: 'github', label: 'GitHub', value: 'UzairKhalil', href: site.social.github, external: true },
+];
+
+if (site.showPhone && site.phone) {
+  const tel = `tel:${site.phone.replace(/\s/g, '')}`;
+  channels.splice(1, 0, { icon: 'phone', label: 'Phone', value: site.phone, href: tel, external: false });
+}
+---
+
+<Section id="contact">
+  <div class="contact">
+    <div class="contact__intro" data-reveal>
+      <p class="eyebrow">Contact</p>
+      <h2 id="contact-title">
+        Have an integration <span class="serif">to build?</span>
+      </h2>
+      <p class="contact__lead">
+        Tell me about the platform, the APIs involved and what you need it to do. I usually reply within one to two
+        business days.
+      </p>
+
+      <ul class="channels">
+        {
+          channels.map((c) => (
+            <li>
+              <a
+                href={c.href}
+                {...(c.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                class="channel"
+              >
+                <span class="channel__icon">
+                  <Icon name={c.icon} size={18} />
+                </span>
+                <span class="channel__text">
+                  <span class="channel__label">{c.label}</span>
+                  <span class="channel__value">{c.value}</span>
+                </span>
+                <Icon name="arrowUpRight" size={18} class="channel__arrow" />
+                {c.external && <span class="sr-only">(opens in a new tab)</span>}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <form
+      class="form"
+      data-contact-form
+      data-endpoint={site.contactFormEndpoint}
+      data-email={site.email}
+      action={site.contactFormEndpoint || `mailto:${site.email}`}
+      method={site.contactFormEndpoint ? 'post' : 'get'}
+      data-reveal
+      style="--reveal-delay:1"
+      novalidate
+    >
+      <div class="field">
+        <label for="cf-name">Name</label>
+        <input id="cf-name" name="name" type="text" autocomplete="name" required />
+      </div>
+      <div class="field">
+        <label for="cf-email">Email</label>
+        <input id="cf-email" name="email" type="email" autocomplete="email" required />
+      </div>
+      <div class="field field--full">
+        <label for="cf-topic">What's it about?</label>
+        <select id="cf-topic" name="topic">
+          <option>Marketplace / store integration</option>
+          <option>Inventory & order sync</option>
+          <option>Laravel SaaS development</option>
+          <option>Performance & queues</option>
+          <option>Full-time role</option>
+          <option>Something else</option>
+        </select>
+      </div>
+      <div class="field field--full">
+        <label for="cf-message">Message</label>
+        <textarea id="cf-message" name="message" rows="5" required minlength="10"></textarea>
+      </div>
+
+      <div class="form__footer field--full">
+        <Button type="submit" size="lg" icon="send">Send message</Button>
+        <p class="form__status" role="status" aria-live="polite" data-form-status></p>
+      </div>
+      {
+        !site.contactFormEndpoint && (
+          <p class="form__note field--full">This form opens your email app with the message pre-filled.</p>
+        )
+      }
+    </form>
+  </div>
+</Section>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  const status = form?.querySelector<HTMLElement>('[data-form-status]');
+
+  const setStatus = (text: string, tone: 'ok' | 'error' | '' = '') => {
+    if (!status) return;
+    status.textContent = text;
+    status.dataset.tone = tone;
+  };
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    // Native validation with visible messages
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      const firstInvalid = form.querySelector<HTMLElement>(':invalid');
+      firstInvalid?.focus();
+      setStatus('Please fill in your name, a valid email and a short message.', 'error');
+      return;
+    }
+
+    const data = new FormData(form);
+    const endpoint = form.dataset.endpoint;
+
+    if (endpoint) {
+      setStatus('Sending…');
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          body: data,
+          headers: { Accept: 'application/json' },
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        form.classList.remove('was-validated');
+        setStatus('Thanks — your message has been sent.', 'ok');
+      } catch {
+        setStatus(`Something went wrong. Please email ${form.dataset.email} directly.`, 'error');
+      }
+      return;
+    }
+
+    // No endpoint configured: open the visitor's mail client.
+    const subject = `[Portfolio] ${data.get('topic')} — ${data.get('name')}`;
+    const body = `${data.get('message')}\n\n— ${data.get('name')} (${data.get('email')})`;
+    window.location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setStatus('Opening your email app…', 'ok');
+  });
+</script>
+
+<style>
+  .contact {
+    display: grid;
+    gap: clamp(40px, 6vw, 72px);
+    padding: clamp(24px, 5vw, 64px);
+    border-radius: 28px;
+    background: var(--ink);
+    color: var(--bg);
+    /* Panel-local tokens for the inverted (ink) background */
+    --panel-line: color-mix(in srgb, var(--bg) 16%, transparent);
+    --panel-line-strong: color-mix(in srgb, var(--bg) 30%, transparent);
+    --panel-muted: color-mix(in srgb, var(--bg) 70%, transparent);
+  }
+
+  .contact__intro .eyebrow {
+    color: var(--panel-muted);
+  }
+
+  .contact__intro .eyebrow::before {
+    background: var(--accent-inverse);
+  }
+
+  @media (min-width: 960px) {
+    .contact {
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    }
+  }
+
+  .contact__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  h2 {
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+  }
+
+  h2 .serif {
+    color: var(--accent-inverse);
+  }
+
+  .contact__lead {
+    max-width: 46ch;
+    color: var(--panel-muted);
+    font-size: 1.08rem;
+  }
+
+  .channels {
+    list-style: none;
+    display: grid;
+    margin-top: 8px;
+    border-top: 1px solid var(--panel-line);
+  }
+
+  .channel {
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--panel-line);
+    text-decoration: none;
+  }
+
+  .channel__icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--panel-line-strong);
+    border-radius: 50%;
+  }
+
+  .channel__text {
+    display: grid;
+    min-width: 0;
+  }
+
+  .channel__label {
+    color: var(--panel-muted);
+    font-size: 0.8rem;
+  }
+
+  .channel__value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 500;
+  }
+
+  .channel :global(.channel__arrow) {
+    opacity: 0.5;
+    transition:
+      transform 0.25s var(--ease),
+      opacity 0.25s var(--ease);
+  }
+
+  .channel:hover :global(.channel__arrow) {
+    opacity: 1;
+    color: var(--accent-inverse);
+    transform: translate(2px, -2px);
+  }
+
+  /* Form */
+  .form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: clamp(20px, 3vw, 32px);
+    border-radius: var(--radius-lg);
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  @media (min-width: 560px) {
+    .form {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .field {
+    display: grid;
+    gap: 8px;
+  }
+
+  .field--full {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    font-size: 0.88rem;
+    font-weight: 500;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    background: var(--bg-elevated);
+    color: var(--ink);
+    font-size: 1rem;
+    transition:
+      border-color 0.2s var(--ease),
+      box-shadow 0.2s var(--ease);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 140px;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+
+  :global(.was-validated) :is(input, textarea):invalid {
+    border-color: var(--accent);
+  }
+
+  .form__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-top: 4px;
+  }
+
+  .form__status {
+    font-size: 0.92rem;
+  }
+
+  .form__status[data-tone='error'] {
+    color: var(--accent);
+  }
+
+  .form__status[data-tone='ok'] {
+    color: var(--ok);
+  }
+
+  .form__note {
+    color: var(--muted);
+    font-size: 0.84rem;
+  }
+</style>

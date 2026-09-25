@@ -1,0 +1,347 @@
+---
+import { Image } from 'astro:assets';
+import profile from '@/assets/profile.png';
+import Button from '@/components/Button.astro';
+import Icon from '@/components/Icon.astro';
+import { site } from '@/data/site';
+import { platforms } from '@/data/skills';
+import { projects } from '@/data/projects';
+
+const stats = [
+  { value: `${site.yearsExperience}`, label: 'Years building with Laravel' },
+  { value: `${platforms.length - 1}`, label: 'Commerce & CRM platform APIs' },
+  { value: `${projects.length}`, label: 'Products & systems shipped' },
+];
+
+const floating = ['Amazon SP-API', 'Shopify', 'Webhooks', 'Queues'];
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero__bg" aria-hidden="true"></div>
+  <div class="container hero__inner">
+    <div class="hero__copy">
+      <p class="hero__status" data-reveal>
+        <span class="pulse" aria-hidden="true"></span>
+        {site.availability}
+      </p>
+
+      <h1 id="hero-title" data-reveal style="--reveal-delay:1">
+        <span class="hero__name">{site.name}</span>
+        <span class="hero__headline">
+          {site.headline.before} <span class="serif">{site.headline.emphasis}</span> {site.headline.after}
+        </span>
+      </h1>
+
+      <p class="hero__intro" data-reveal style="--reveal-delay:2">
+        {site.role} {site.tagline}
+      </p>
+
+      <div class="hero__actions" data-reveal style="--reveal-delay:3">
+        <Button href="#projects" size="lg" icon="arrowRight">View projects</Button>
+        <Button href="#contact" size="lg" variant="secondary">Get in touch</Button>
+        {
+          site.resumeUrl && (
+            <Button href={site.resumeUrl} size="lg" variant="ghost" icon="download" iconPosition="start" download>
+              Résumé
+            </Button>
+          )
+        }
+      </div>
+
+      <dl class="hero__stats" data-reveal style="--reveal-delay:4">
+        {
+          stats.map((s) => (
+            <div class="stat">
+              <dt>{s.label}</dt>
+              <dd>{s.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+
+    <div class="hero__visual" data-reveal style="--reveal-delay:2">
+      <div class="portrait">
+        <Image
+          src={profile}
+          alt={`Portrait of ${site.name}`}
+          widths={[360, 540, 720, 960]}
+          sizes="(min-width: 960px) 440px, (min-width: 640px) 60vw, 88vw"
+          loading="eager"
+          fetchpriority="high"
+          class="portrait__img"
+        />
+        <div class="portrait__card">
+          <Icon name="mapPin" size={16} />
+          <span>{site.location}</span>
+        </div>
+      </div>
+      <ul class="chips" aria-hidden="true">
+        {floating.map((c, i) => <li class={`chip chip--${i}`}>{c}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    padding-block: clamp(40px, 7vw, 96px) clamp(8px, 3vw, 32px);
+    overflow: hidden;
+  }
+
+  .hero__bg {
+    position: absolute;
+    inset: -20% -10% auto;
+    height: 120%;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 60% 55% at 70% 35%, #000 10%, transparent 70%);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .hero__inner {
+    position: relative;
+    display: grid;
+    gap: clamp(48px, 7vw, 80px);
+    align-items: center;
+  }
+
+  @media (min-width: 960px) {
+    .hero__inner {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.9fr);
+    }
+  }
+
+  .hero__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg-elevated);
+    color: var(--ink-soft);
+    font-size: 0.86rem;
+  }
+
+  .pulse {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ok);
+  }
+
+  .pulse::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--ok);
+    animation: pulse 2s var(--ease) infinite;
+  }
+
+  @keyframes pulse {
+    to {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+
+  h1 {
+    display: grid;
+    gap: 18px;
+    margin-top: 28px;
+  }
+
+  .hero__name {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--accent);
+  }
+
+  .hero__headline {
+    font-size: clamp(2.35rem, 6vw, 4.6rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+  }
+
+  .hero__headline .serif {
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+
+  .hero__intro {
+    max-width: 56ch;
+    margin-top: 26px;
+    color: var(--muted);
+    font-size: clamp(1.05rem, 1.5vw, 1.18rem);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 36px;
+  }
+
+  .hero__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    max-width: 560px;
+    margin: 52px 0 0;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 6px;
+  }
+
+  .stat dd {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .stat dd::after {
+    content: '+';
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  .stat dt {
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.35;
+  }
+
+  /* Portrait */
+  .hero__visual {
+    position: relative;
+    justify-self: center;
+    width: min(100%, 440px);
+  }
+
+  .portrait {
+    position: relative;
+    border-radius: 28px;
+    padding: 10px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-lg);
+    transform: rotate(1.2deg);
+    transition: transform 0.6s var(--ease);
+  }
+
+  .portrait:hover {
+    transform: rotate(0deg);
+  }
+
+  .portrait__img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 50% 30%;
+    border-radius: 20px;
+  }
+
+  .portrait__card {
+    position: absolute;
+    left: -14px;
+    bottom: 28px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow);
+    font-size: 0.86rem;
+    font-weight: 500;
+    transform: rotate(-1.2deg);
+  }
+
+  .portrait__card :global(.icon) {
+    color: var(--accent);
+  }
+
+  .chips {
+    list-style: none;
+  }
+
+  .chip {
+    position: absolute;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    white-space: nowrap;
+    box-shadow: var(--shadow);
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .chip--0 {
+    top: 8%;
+    right: -18px;
+  }
+  .chip--1 {
+    top: 30%;
+    left: -26px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    animation-delay: -1.5s;
+  }
+  .chip--2 {
+    bottom: 34%;
+    right: -30px;
+    background: var(--bg-elevated);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    animation-delay: -3s;
+  }
+  .chip--3 {
+    bottom: -14px;
+    right: 18%;
+    animation-delay: -4.5s;
+  }
+
+  @keyframes float {
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @media (max-width: 559px) {
+    .hero__stats {
+      gap: 12px;
+    }
+
+    .chip--0,
+    .chip--2 {
+      right: -4px;
+    }
+
+    .chip--1 {
+      left: -4px;
+    }
+
+    .portrait__card {
+      left: 8px;
+    }
+  }
+</style>

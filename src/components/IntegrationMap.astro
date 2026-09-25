@@ -1,0 +1,180 @@
+---
+/**
+ * Illustrative diagram of the integration architecture I typically build:
+ * sales channels ⇄ Laravel core ⇄ queues / database / carriers.
+ * Decorative detail is animated; motion is disabled for reduced-motion users.
+ */
+const channels = ['Amazon SP-API', 'Shopify', 'WooCommerce', 'BigCommerce', 'eBay', 'Etsy'];
+const services = ['Queue workers', 'MySQL', 'Carrier APIs'];
+
+const W = 760;
+const H = 380;
+const core = { x: 300, y: 130, w: 160, h: 120 };
+const leftX = 150;
+const rightX = 590;
+const channelY = channels.map((_, i) => 40 + i * ((H - 80) / (channels.length - 1)));
+const serviceY = services.map((_, i) => 90 + i * 100);
+
+const leftPaths = channelY.map((y) => {
+  const tx = core.x;
+  const ty = core.y + core.h / 2 + (y - H / 2) * 0.25;
+  return `M ${leftX} ${y} C ${leftX + 80} ${y}, ${tx - 80} ${ty}, ${tx} ${ty}`;
+});
+const rightPaths = serviceY.map((y) => {
+  const sx = core.x + core.w;
+  const sy = core.y + core.h / 2 + (y - H / 2) * 0.35;
+  return `M ${sx} ${sy} C ${sx + 60} ${sy}, ${rightX - 70} ${y}, ${rightX} ${y}`;
+});
+---
+
+<figure class="map" data-reveal>
+  <svg
+    viewBox={`0 0 ${W} ${H}`}
+    role="img"
+    aria-labelledby="map-title map-desc"
+    preserveAspectRatio="xMidYMid meet"
+  >
+    <title id="map-title">Integration architecture</title>
+    <desc id="map-desc">
+      Sales channels — {channels.join(', ')} — connect through webhooks and OAuth2 to a Laravel core, which
+      hands work to queue workers, MySQL and carrier APIs.
+    </desc>
+
+    <g class="map__wires">
+      {leftPaths.map((d, i) => <path d={d} class="wire" style={`--i:${i}`} />)}
+      {rightPaths.map((d, i) => <path d={d} class="wire wire--out" style={`--i:${i}`} />)}
+    </g>
+
+    <g class="map__nodes">
+      {
+        channels.map((name, i) => (
+          <g transform={`translate(${leftX}, ${channelY[i]})`}>
+            <rect x="-140" y="-17" width="140" height="34" rx="17" class="node" />
+            <circle cx="0" cy="0" r="4" class="dot" />
+            <text x="-70" y="5" text-anchor="middle" class="label">
+              {name}
+            </text>
+          </g>
+        ))
+      }
+
+      <g transform={`translate(${core.x}, ${core.y})`}>
+        <rect width={core.w} height={core.h} rx="18" class="core" />
+        <text x={core.w / 2} y="44" text-anchor="middle" class="core__title">
+          Laravel core
+        </text>
+        <text x={core.w / 2} y="70" text-anchor="middle" class="core__sub">
+          Webhooks · OAuth2
+        </text>
+        <text x={core.w / 2} y="90" text-anchor="middle" class="core__sub">
+          REST · GraphQL
+        </text>
+      </g>
+
+      {
+        services.map((name, i) => (
+          <g transform={`translate(${rightX}, ${serviceY[i]})`}>
+            <rect x="0" y="-17" width="150" height="34" rx="8" class="node node--svc" />
+            <circle cx="0" cy="0" r="4" class="dot" />
+            <text x="75" y="5" text-anchor="middle" class="label">
+              {name}
+            </text>
+          </g>
+        ))
+      }
+    </g>
+  </svg>
+  <figcaption>
+    Typical shape of the integrations I build — orders, inventory and tracking flowing between channels and one
+    Laravel core.
+  </figcaption>
+</figure>
+
+<style>
+  .map {
+    margin: 0;
+    padding: clamp(16px, 3vw, 32px);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(ellipse at 50% 50%, var(--accent-soft), transparent 60%),
+      var(--bg-elevated);
+  }
+
+  svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .wire {
+    fill: none;
+    stroke: var(--line-strong);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 6;
+    animation: flow 1.6s linear infinite;
+    animation-delay: calc(var(--i) * -0.25s);
+  }
+
+  .wire--out {
+    stroke: var(--accent);
+    opacity: 0.6;
+  }
+
+  @keyframes flow {
+    to {
+      stroke-dashoffset: -20;
+    }
+  }
+
+  .node {
+    fill: var(--bg);
+    stroke: var(--line-strong);
+  }
+
+  .node--svc {
+    stroke: var(--accent);
+  }
+
+  .dot {
+    fill: var(--accent);
+  }
+
+  .label {
+    fill: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+  }
+
+  .core {
+    fill: var(--ink);
+  }
+
+  .core__title {
+    fill: var(--bg);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  .core__sub {
+    fill: var(--bg);
+    opacity: 0.7;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  figcaption {
+    margin-top: 16px;
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  @media (max-width: 639px) {
+    /* The platform list below conveys the same information at small widths. */
+    .map {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,48 @@
+---
+import Section from '@/components/Section.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import { projects } from '@/data/projects';
+
+const featured = projects.filter((p) => p.featured);
+const others = projects.filter((p) => !p.featured);
+---
+
+<Section id="projects">
+  <SectionHeading
+    id="projects-title"
+    eyebrow="Projects"
+    title="Selected work in"
+    lead="Real products I've built or contributed to. Screenshots are placeholders until images that can be shared publicly are added."
+  >
+    <Fragment slot="emphasis">SaaS & eCommerce.</Fragment>
+  </SectionHeading>
+
+  <div class="featured">
+    {featured.map((project, i) => <ProjectCard project={project} index={i} layout="feature" />)}
+  </div>
+
+  {
+    others.length > 0 && (
+      <div class="others">
+        {others.map((project, i) => (
+          <ProjectCard project={project} index={featured.length + i} />
+        ))}
+      </div>
+    )
+  }
+</Section>
+
+<style>
+  .featured {
+    display: grid;
+    gap: 20px;
+  }
+
+  .others {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+</style>

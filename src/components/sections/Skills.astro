@@ -1,0 +1,98 @@
+---
+import Section from '@/components/Section.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import SkillCard from '@/components/SkillCard.astro';
+import IntegrationMap from '@/components/IntegrationMap.astro';
+import { platforms, skillGroups } from '@/data/skills';
+---
+
+<Section id="skills" tone="sunken">
+  <SectionHeading
+    id="skills-title"
+    eyebrow="Skills"
+    title="A backend toolkit built around"
+    lead="Laravel and MySQL at the core, with the integration, queueing and optimisation work that production eCommerce systems demand."
+  >
+    <Fragment slot="emphasis">integrations.</Fragment>
+  </SectionHeading>
+
+  <IntegrationMap />
+
+  <div class="platforms" data-reveal>
+    <h3 class="platforms__title">Platforms & APIs integrated in production</h3>
+    <ul class="platforms__list">
+      {
+        platforms.map((p) => (
+          <li>
+            <span class="platforms__name">{p.name}</span>
+            <span class="platforms__detail">{p.detail}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="grid">
+    {skillGroups.map((group, i) => <SkillCard group={group} index={i} />)}
+  </div>
+</Section>
+
+<style>
+  .platforms {
+    margin-block: clamp(40px, 6vw, 64px);
+  }
+
+  .platforms__title {
+    margin-bottom: 18px;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .platforms__list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+
+  @media (min-width: 560px) {
+    .platforms__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .platforms__list li {
+    display: grid;
+    gap: 2px;
+    padding: 18px 20px;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+    transition: background-color 0.2s var(--ease);
+  }
+
+  .platforms__list li:hover {
+    background: var(--bg-elevated);
+  }
+
+  .platforms__name {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .platforms__detail {
+    color: var(--muted);
+    font-size: 0.86rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: 16px;
+  }
+</style>

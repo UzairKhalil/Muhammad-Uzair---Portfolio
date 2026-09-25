@@ -1,0 +1,89 @@
+---
+import Section from '@/components/Section.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import ServiceCard from '@/components/ServiceCard.astro';
+import { process, services } from '@/data/services';
+---
+
+<Section id="services" tone="sunken">
+  <SectionHeading
+    id="services-title"
+    eyebrow="Services"
+    title="How I can help"
+    lead="Available for remote full-time roles, contracts and freelance engagements."
+  >
+    <Fragment slot="emphasis">your team.</Fragment>
+  </SectionHeading>
+
+  <div class="grid">
+    {services.map((service, i) => <ServiceCard service={service} index={i} />)}
+  </div>
+
+  <div class="process" data-reveal>
+    <h3 class="process__title">How I work</h3>
+    <ol class="process__list">
+      {
+        process.map((p) => (
+          <li>
+            <span class="process__step mono" aria-hidden="true">
+              {p.step}
+            </span>
+            <h4>{p.title}</h4>
+            <p>{p.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</Section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: 16px;
+  }
+
+  .process {
+    margin-top: clamp(48px, 7vw, 80px);
+  }
+
+  .process__title {
+    margin-bottom: 20px;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .process__list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .process__list li {
+    display: grid;
+    gap: 8px;
+    padding: 24px 24px 24px 0;
+  }
+
+  .process__step {
+    color: var(--accent);
+    font-size: 0.82rem;
+  }
+
+  h4 {
+    font-size: 1.15rem;
+  }
+
+  .process__list p {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+</style>
